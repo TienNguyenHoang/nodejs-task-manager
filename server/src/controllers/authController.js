@@ -7,7 +7,7 @@ export const register = async (req, res, next) => {
 
         const existing = await User.findOne({ email });
         if (existing) {
-            return res.status(400).json({ message: 'Email đã được đăng ký' });
+            return next({ statusCode: 400, message: 'Email đã tồn tại' });
         }
 
         const user = await User.create({
@@ -36,10 +36,10 @@ export const login = async (req, res, next) => {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'Sai email hoặc mật khẩu' });
+        if (!user) return next({ statusCode: 400, message: 'Sai email hoặc mật khẩu' });
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
-        if (!isMatch) return res.status(400).json({ message: 'Sai email hoặc mật khẩu' });
+        if (!isMatch) return next({ statusCode: 400, message: 'Sai email hoặc mật khẩu' });
 
         const token = generateToken(user);
 

@@ -1,11 +1,12 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import connectDB from "./config/db.js";
+import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
 import routes from './routes/index.js';
+import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +25,9 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-connectDB()
+app.use(errorMiddleware);
+
+connectDB();
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);

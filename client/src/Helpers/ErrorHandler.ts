@@ -9,18 +9,18 @@ export const handleError = (err: any) => {
         const status = err.response?.status;
         let message = err.response?.data?.message || 'Lỗi không xác định';
         switch (status) {
-            case 400:
-                // ModelState Error
-                const modelStateError = err.response?.data.errors;
-                if (typeof modelStateError === 'object') {
-                    for (let errorKey in modelStateError) {
-                        toast.warning(modelStateError[errorKey][0]);
-                    }
-                    // BadRequest
+            case 400: {
+                // Joi validation errors (array)
+                const validationErrors = err.response?.data?.errors;
+                if (Array.isArray(validationErrors)) {
+                    validationErrors.forEach((e: any) => {
+                        toast.warning(e.message);
+                    });
                 } else {
                     toast.error(`Yêu cầu không hợp lệ: ${message}`);
                 }
                 break;
+            }
             case 401:
                 toast.warn(message || 'Vui lòng đăng nhập lại');
 
