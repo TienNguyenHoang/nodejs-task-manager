@@ -23,7 +23,7 @@ export const CreateTaskApi = async (form: CreateTaskRequest) => {
     }
 };
 
-export const UpdateTaskApi = async (taskId: number, form: UpdateTaskRequest) => {
+export const UpdateTaskApi = async (taskId: string, form: UpdateTaskRequest) => {
     try {
         const response = await request.put<{
             message: string;
@@ -35,7 +35,7 @@ export const UpdateTaskApi = async (taskId: number, form: UpdateTaskRequest) => 
     }
 };
 
-export const DeleteTaskApi = async (taskId: number) => {
+export const DeleteTaskApi = async (taskId: string) => {
     try {
         const response = await request.delete<{ message: string }>(`tasks/${taskId}`);
         return response.data;

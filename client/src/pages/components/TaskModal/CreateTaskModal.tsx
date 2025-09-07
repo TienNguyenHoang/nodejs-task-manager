@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast } from 'react-toastify';
 
 import { Modal, Icon } from '~/components';
 import { Status, Priority, type CreateTaskRequest } from '~/Models';
@@ -50,9 +49,8 @@ const CreateTaskModal = ({
         setOpen(false);
     };
 
-    const onSubmit = async (form: CreateTaskRequest) => {
-        const message = await createTask(form);
-        toast.success(message);
+    const onSubmit = (form: CreateTaskRequest) => {
+        createTask(form);
         handleCloseModal();
     };
 

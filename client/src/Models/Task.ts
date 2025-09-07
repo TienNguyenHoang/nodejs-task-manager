@@ -11,8 +11,8 @@ export enum Priority {
 }
 
 export interface Task {
-    taskId: number;
-    userId: number;
+    taskId: string;
+    userId: string;
     title: string;
     description: string;
     status: Status;

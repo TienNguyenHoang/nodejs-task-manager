@@ -67,11 +67,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const editProfileUser = async (form: EditProfileRequest) => {
         const data = await EditProfileApi(form);
         if (data) {
-            toast.success('Cập nhật thành công!');
+            toast.success(data.message);
             const user: UserProfile = {
-                userId: data.userId,
-                email: data.email,
-                fullName: data.fullName,
+                userId: data.user.userId,
+                email: data.user.email,
+                fullName: data.user.fullName,
             };
             setUser(user);
             localStorage.setItem('user', JSON.stringify(user));
@@ -81,12 +81,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const changePassword = async (form: ChangePasswordRequest) => {
         const data = await ChangePasswordApi(form);
         if (data) {
-            toast.success('Đổi mật khẩu thành công!');
+            toast.success(data.message);
             toast.info('Vui lòng đăng nhập lại!');
             Cookies.remove('accessToken');
             setUser(null);
             localStorage.removeItem('user');
-            
+
             navigate('/login');
         }
     };

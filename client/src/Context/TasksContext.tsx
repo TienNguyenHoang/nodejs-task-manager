@@ -5,6 +5,7 @@ import { CreateTaskApi, DeleteTaskApi, GetAllTaskApi, UpdateTaskApi } from '~/se
 import { Priority, Status, type CreateTaskRequest, type Task, type UpdateTaskRequest } from '~/Models';
 import { CreateTaskStatistics, type TaskStatisticsType } from '~/Helpers';
 import { DashboardFilterOptions, PendingSortOptions, CompletedSortOptions } from '~/pages/components';
+import { toast } from 'react-toastify';
 
 type ModalType = {
     type: 'create' | 'edit' | 'delete' | undefined;
@@ -33,10 +34,10 @@ type TaskContextType = {
     getTasks: (filter: DashboardFilterOptions) => FilterType;
     getPendingTasks: (sort: PendingSortOptions) => Task[] | undefined;
     getCompletedTasks: (sort: CompletedSortOptions) => Task[] | undefined;
-    createTask: (form: CreateTaskRequest) => Promise<string | undefined>;
-    updateTask: (taskId: number, form: UpdateTaskRequest) => Promise<string | undefined>;
-    getTask: (taskId: number) => Task | undefined;
-    deleteTask: (taskId: number) => Promise<string | undefined>;
+    createTask: (form: CreateTaskRequest) => void;
+    updateTask: (taskId: string, form: UpdateTaskRequest) => void;
+    getTask: (taskId: string) => Task | undefined;
+    deleteTask: (taskId: string) => void;
 };
 
 const TasksContext = createContext<TaskContextType>({} as TaskContextType);
@@ -152,7 +153,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const getTask = (taskId: number) => {
+    const getTask = (taskId: string) => {
         if (tasks) {
             return tasks.find((task) => task.taskId === taskId);
         }
@@ -161,6 +162,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const createTask = async (form: CreateTaskRequest) => {
         const data = await CreateTaskApi(form);
         if (data) {
+            toast.success(data.message);
             setTasks([
                 ...(tasks as Task[]),
                 {
@@ -170,12 +172,12 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                 },
             ]);
         }
-        return data?.message;
     };
 
-    const updateTask = async (taskId: number, form: UpdateTaskRequest) => {
+    const updateTask = async (taskId: string, form: UpdateTaskRequest) => {
         const data = await UpdateTaskApi(taskId, form);
         if (data) {
+            toast.success(data.message);
             const newTasks = tasks?.map((task) => {
                 if (task.taskId === data?.task.taskId) {
                     return {
@@ -193,11 +195,11 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
             });
             setTasks(newTasks as Task[]);
         }
-        return data?.message;
     };
 
-    const deleteTask = async (taskId: number) => {
+    const deleteTask = async (taskId: string) => {
         const data = await DeleteTaskApi(taskId);
+        toast.success(data?.message);
         const newTasks = tasks?.filter((task) => {
             if (task.taskId !== taskId) {
                 return {
@@ -208,7 +210,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
             }
         });
         setTasks(newTasks);
-        return data?.message;
     };
 
     const TaskStatistics = CreateTaskStatistics(tasks);

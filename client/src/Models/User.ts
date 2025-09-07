@@ -1,12 +1,12 @@
 export interface User {
-    userId: number;
+    userId: string;
     fullName: string;
     email: string;
     passwordHash: string;
 }
 
 export interface UserProfile {
-    userId: number;
+    userId: string;
     fullName: string;
     email: string;
 }

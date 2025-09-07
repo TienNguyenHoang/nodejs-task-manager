@@ -3,7 +3,10 @@ import type { ChangePasswordRequest, EditProfileRequest, UserProfile } from '~/M
 
 export const EditProfileApi = async (form: EditProfileRequest) => {
     try {
-        const response = await request.put<UserProfile>('user/editProfile', form);
+        const response = await request.put<{
+            message: string;
+            user: UserProfile;
+        }>('user/editProfile', form);
         return response.data;
     } catch (err) {
         console.log('error from LoginAPI', err);

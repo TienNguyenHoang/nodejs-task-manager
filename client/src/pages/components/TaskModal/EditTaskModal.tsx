@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast } from 'react-toastify';
 
 import { Modal, Icon } from '~/components';
 import { Status, Priority, type UpdateTaskRequest } from '~/Models';
@@ -32,10 +31,10 @@ const EditTaskModal = ({
 }: {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    taskId: number | undefined;
+    taskId: string | undefined;
 }) => {
     const { updateTask, getTask } = useTasks();
-    const task = getTask(taskId as number);
+    const task = getTask(taskId as string);
 
     const {
         register,
@@ -60,10 +59,9 @@ const EditTaskModal = ({
         setOpen(false);
     };
 
-    const onSubmit = async (form: UpdateTaskRequest) => {
+    const onSubmit = (form: UpdateTaskRequest) => {
         if (taskId) {
-            const message = await updateTask(taskId, form);
-            toast.success(message);
+            updateTask(taskId, form);
             handleCloseModal();
         }
     };

@@ -1,5 +1,3 @@
-import { toast } from 'react-toastify';
-
 import { Modal, Icon } from '~/components';
 import { useTasks } from '~/Context';
 
@@ -10,14 +8,13 @@ const DeleteTaskModal = ({
 }: {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    taskId: number | undefined;
+    taskId: string | undefined;
 }) => {
     const { getTask, deleteTask } = useTasks();
-    const task = getTask(taskId as number);
-    const handleDeleteTask = async () => {
+    const task = getTask(taskId as string);
+    const handleDeleteTask = () => {
         if (taskId) {
-            const message = await deleteTask(taskId);
-            toast.success(message);
+            deleteTask(taskId);
             setOpen(false);
         }
     };
