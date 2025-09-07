@@ -3,7 +3,7 @@ import type { ChangePasswordRequest, EditProfileRequest, UserProfile } from '~/M
 
 export const EditProfileApi = async (form: EditProfileRequest) => {
     try {
-        const response = await request.put<UserProfile>('User/editProfile', form);
+        const response = await request.put<UserProfile>('user/editProfile', form);
         return response.data;
     } catch (err) {
         console.log('error from LoginAPI', err);
@@ -12,7 +12,7 @@ export const EditProfileApi = async (form: EditProfileRequest) => {
 
 export const ChangePasswordApi = async (form: ChangePasswordRequest) => {
     try {
-        const response = await request.put<{ message: string }>('User/changePassword', form);
+        const response = await request.put<{ message: string }>('user/changePassword', form);
         return response.data;
     } catch (err) {
         console.log('error from RegisterAPI', err);

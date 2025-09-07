@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import routes from './routes/index.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -18,6 +20,9 @@ app.use(
     }),
 );
 app.use(express.json());
+
+// init route
+app.use('/api', routes);
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);

@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { handleError } from '~/Helpers';
 
 const httpRequest = axios.create({
-    baseURL: 'https://localhost:7241/api/',
+    baseURL: `${import.meta.env.VITE_BASE_URL}/api/`,
     timeout: 10000,
 });
 
