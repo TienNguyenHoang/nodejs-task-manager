@@ -60,10 +60,10 @@ const EditTaskModal = ({
         setOpen(false);
     };
 
-    const onSubmit = (form: UpdateTaskRequest) => {
+    const onSubmit = async (form: UpdateTaskRequest) => {
         if (taskId) {
-            updateTask(taskId, form);
-            toast.success('Cập nhật task thành công!');
+            const message = await updateTask(taskId, form);
+            toast.success(message);
             handleCloseModal();
         }
     };

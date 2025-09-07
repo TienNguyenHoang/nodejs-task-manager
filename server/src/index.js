@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import routes from './routes/index.js';
+import notFoundMiddleware from './middlewares/notFoundMiddleware.js';
 import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,6 +25,9 @@ app.use(
 app.use(express.json());
 
 app.use('/api', routes);
+
+// middleware cho route không tồn tại
+app.use(notFoundMiddleware);
 
 app.use(errorMiddleware);
 

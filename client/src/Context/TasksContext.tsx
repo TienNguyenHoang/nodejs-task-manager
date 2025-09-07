@@ -33,10 +33,10 @@ type TaskContextType = {
     getTasks: (filter: DashboardFilterOptions) => FilterType;
     getPendingTasks: (sort: PendingSortOptions) => Task[] | undefined;
     getCompletedTasks: (sort: CompletedSortOptions) => Task[] | undefined;
-    createTask: (form: CreateTaskRequest) => void;
-    updateTask: (taskId: number, form: UpdateTaskRequest) => void;
+    createTask: (form: CreateTaskRequest) => Promise<string | undefined>;
+    updateTask: (taskId: number, form: UpdateTaskRequest) => Promise<string | undefined>;
     getTask: (taskId: number) => Task | undefined;
-    deleteTask: (taskId: number) => void;
+    deleteTask: (taskId: number) => Promise<string | undefined>;
 };
 
 const TasksContext = createContext<TaskContextType>({} as TaskContextType);
@@ -164,23 +164,24 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
             setTasks([
                 ...(tasks as Task[]),
                 {
-                    ...data,
-                    createdAt: new Date(data.createdAt),
-                    dueDate: new Date(data.dueDate),
+                    ...data.task,
+                    createdAt: new Date(data.task.createdAt),
+                    dueDate: new Date(data.task.dueDate),
                 },
             ]);
         }
+        return data?.message;
     };
 
     const updateTask = async (taskId: number, form: UpdateTaskRequest) => {
         const data = await UpdateTaskApi(taskId, form);
         if (data) {
             const newTasks = tasks?.map((task) => {
-                if (task.taskId === data?.taskId) {
+                if (task.taskId === data?.task.taskId) {
                     return {
-                        ...data,
-                        createdAt: new Date(data.createdAt),
-                        dueDate: new Date(data.dueDate),
+                        ...data.task,
+                        createdAt: new Date(data.task.createdAt),
+                        dueDate: new Date(data.task.dueDate),
                     };
                 } else {
                     return {
@@ -192,10 +193,11 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
             });
             setTasks(newTasks as Task[]);
         }
+        return data?.message;
     };
 
     const deleteTask = async (taskId: number) => {
-        await DeleteTaskApi(taskId);
+        const data = await DeleteTaskApi(taskId);
         const newTasks = tasks?.filter((task) => {
             if (task.taskId !== taskId) {
                 return {
@@ -206,6 +208,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
             }
         });
         setTasks(newTasks);
+        return data?.message;
     };
 
     const TaskStatistics = CreateTaskStatistics(tasks);

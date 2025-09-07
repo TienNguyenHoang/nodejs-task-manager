@@ -14,10 +14,10 @@ const DeleteTaskModal = ({
 }) => {
     const { getTask, deleteTask } = useTasks();
     const task = getTask(taskId as number);
-    const handleDeleteTask = () => {
+    const handleDeleteTask = async () => {
         if (taskId) {
-            deleteTask(taskId);
-            toast.success('Xóa task thành công!');
+            const message = await deleteTask(taskId);
+            toast.success(message);
             setOpen(false);
         }
     };

@@ -50,9 +50,9 @@ const CreateTaskModal = ({
         setOpen(false);
     };
 
-    const onSubmit = (form: CreateTaskRequest) => {
-        createTask(form);
-        toast.success('Tạo task thành công!');
+    const onSubmit = async (form: CreateTaskRequest) => {
+        const message = await createTask(form);
+        toast.success(message);
         handleCloseModal();
     };
 
