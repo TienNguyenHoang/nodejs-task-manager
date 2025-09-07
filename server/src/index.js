@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import connectDB from "./config/db.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -21,8 +22,9 @@ app.use(
 );
 app.use(express.json());
 
-// init route
 app.use('/api', routes);
+
+connectDB()
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
