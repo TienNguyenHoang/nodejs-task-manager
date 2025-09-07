@@ -6,12 +6,12 @@ import { Status, type Task } from '~/Models';
 
 type Props = {
     task: Task;
-    setEditModal: (taskId: number) => void;
-    setDeleteModal: (taskId: number) => void;
+    setEditModal: (taskId: string) => void;
+    setDeleteModal: (taskId: string) => void;
 };
 
 const TaskItem = ({ task, setEditModal, setDeleteModal }: Props) => {
-    const [visibleTaskId, setVisibleTaskId] = useState<number | null>(null);
+    const [visibleTaskId, setVisibleTaskId] = useState<string | null>(null);
     const handleOpenEditModal = () => {
         setVisibleTaskId(null);
         setEditModal(task.taskId);

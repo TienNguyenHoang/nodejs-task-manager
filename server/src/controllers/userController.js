@@ -22,7 +22,11 @@ export const editProfile = async (req, res, next) => {
 
         res.json({
             message: 'Cập nhật thông tin thành công',
-            user,
+            user: {
+                userId: user._id,
+                fullName: user.fullName,
+                email: user.email,
+            },
         });
     } catch (error) {
         next(error);

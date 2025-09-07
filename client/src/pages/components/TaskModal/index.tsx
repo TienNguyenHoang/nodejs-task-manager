@@ -6,7 +6,7 @@ type TaskModalType = {
     modalType:
         | {
               type: 'create' | 'edit' | 'delete' | undefined;
-              taskId: number | undefined;
+              taskId: string | undefined;
           }
         | undefined;
     open: boolean;

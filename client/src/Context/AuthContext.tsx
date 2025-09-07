@@ -5,7 +5,15 @@ import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 
 import { LoginApi, RegisterApi, EditProfileApi, ChangePasswordApi } from '~/services';
-import type { UserProfile, LoginRequest, RegisterRequest, EditProfileRequest, ChangePasswordRequest } from '~/Models';
+import type {
+    UserProfile,
+    LoginRequest,
+    RegisterRequest,
+    EditProfileRequest,
+    ChangePasswordRequest,
+    LoginResponse,
+    RegisterResponse,
+} from '~/Models';
 
 type UserContextType = {
     user: UserProfile | null;
@@ -28,12 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const loginUser = async (form: LoginRequest) => {
-        const LoginRequestDto: LoginRequest = {
-            email: form.email,
-            password: form.password,
-        };
-        const data = await LoginApi(LoginRequestDto);
+    const loginHandler = (data: (LoginResponse | RegisterResponse) | undefined) => {
         if (data) {
             const redirectTo = location.state?.from?.pathname || '/';
             toast.success('Đăng nhập thành công');
@@ -44,12 +47,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const loginUser = async (form: LoginRequest) => {
+        const LoginRequestDto: LoginRequest = {
+            email: form.email,
+            password: form.password,
+        };
+        const data = await LoginApi(LoginRequestDto);
+        loginHandler(data);
+    };
+
     const registerUser = async (form: RegisterRequest) => {
         const data = await RegisterApi(form);
-        if (data) {
-            toast.success(data.message);
-            navigate('/login', { replace: true });
-        }
+        loginHandler(data);
     };
 
     const logoutUser = () => {

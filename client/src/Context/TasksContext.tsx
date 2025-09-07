@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 type ModalType = {
     type: 'create' | 'edit' | 'delete' | undefined;
-    taskId: number | undefined;
+    taskId: string | undefined;
 };
 
 type TaskModalHandlerType = {
@@ -18,8 +18,8 @@ type TaskModalHandlerType = {
     getType: () => ModalType | undefined;
     setType: React.Dispatch<React.SetStateAction<ModalType | undefined>>;
     handleOpenCreateModal: () => void;
-    handleOpenEditModal: (taskId: number) => void;
-    handleOpenDeleteModal: (taskId: number) => void;
+    handleOpenEditModal: (taskId: string) => void;
+    handleOpenDeleteModal: (taskId: string) => void;
 };
 
 type FilterType = {
@@ -49,7 +49,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const fetchApi = async () => {
             const data = await GetAllTaskApi();
-            const newData = data?.map((task) => {
+            const newData = data?.tasks.map((task) => {
                 return {
                     ...task,
                     createdAt: new Date(task.createdAt),
@@ -225,14 +225,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                 taskId: undefined,
             });
         },
-        handleOpenEditModal(taskId: number) {
+        handleOpenEditModal(taskId: string) {
             setType({
                 type: 'edit',
                 taskId: taskId,
             });
             setOpen(true);
         },
-        handleOpenDeleteModal(taskId: number) {
+        handleOpenDeleteModal(taskId: string) {
             setType({
                 type: 'delete',
                 taskId: taskId,

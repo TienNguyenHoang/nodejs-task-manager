@@ -2,7 +2,6 @@ export interface User {
     userId: string;
     fullName: string;
     email: string;
-    passwordHash: string;
 }
 
 export interface UserProfile {
@@ -25,6 +24,11 @@ export type RegisterRequest = {
     fullName: string;
     email: string;
     password: string;
+};
+
+export type RegisterResponse = {
+    user: User;
+    token: string;
 };
 
 export type EditProfileRequest = {

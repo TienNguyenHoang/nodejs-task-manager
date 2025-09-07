@@ -4,7 +4,7 @@ import type { CreateTaskRequest, UpdateTaskRequest } from '~/Models/Task';
 
 export const GetAllTaskApi = async () => {
     try {
-        const response = await request.get<Task[]>('tasks');
+        const response = await request.get<{ tasks: Task[] }>('tasks');
         return response.data;
     } catch (err) {
         console.log('error from GetAllTaskApi', err);

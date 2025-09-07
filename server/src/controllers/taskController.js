@@ -3,7 +3,13 @@ import Task from '../models/Task.js';
 export const getAllTasks = async (req, res, next) => {
     try {
         const tasks = await Task.find({ userId: req.user.id }).sort({ createdAt: -1 }).lean();
-        res.json({ tasks });
+        const transform = tasks.map((task) => ({
+            ...task,
+            taskId: task._id.toString(),
+            _id: undefined,
+        }));
+
+        res.json({ tasks: transform });
     } catch (error) {
         next(error);
     }
@@ -21,8 +27,14 @@ export const createTask = async (req, res, next) => {
             priority,
             dueDate,
         });
-
-        res.status(201).json({ message: 'Tạo task thành công', task });
+        res.status(201).json({
+            message: 'Tạo task thành công',
+            task: {
+                ...task,
+                taskId: task._id.toString(),
+                _id: undefined,
+            },
+        });
     } catch (error) {
         next(error);
     }
@@ -41,7 +53,14 @@ export const updateTask = async (req, res, next) => {
             return next({ statusCode: 404, message: 'Không tìm thấy task' });
         }
 
-        res.json({ message: 'Cập nhật task thành công', task });
+        res.json({
+            message: 'Cập nhật task thành công',
+            task: {
+                ...task,
+                taskId: task._id.toString(),
+                _id: undefined,
+            },
+        });
     } catch (error) {
         next(error);
     }

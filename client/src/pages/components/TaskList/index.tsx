@@ -30,8 +30,8 @@ type FilterType = DashboardFilterOptions | PendingSortOptions | CompletedSortOpt
 type TaskList = {
     options: FilterType;
     setCreateModal: () => void;
-    setEditModal: (taskId: number) => void;
-    setDeleteModal: (taskId: number) => void;
+    setEditModal: (taskId: string) => void;
+    setDeleteModal: (taskId: string) => void;
 };
 
 const TaskList = ({ options, setCreateModal, setEditModal, setDeleteModal }: TaskList) => {
