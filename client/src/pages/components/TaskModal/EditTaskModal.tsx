@@ -48,7 +48,10 @@ const EditTaskModal = ({
     useEffect(() => {
         if (task) {
             reset({
-                ...task,
+                title: task.title,
+                description: task.description,
+                priority: task.priority,
+                status: task.status,
                 dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
             });
         }
@@ -61,6 +64,7 @@ const EditTaskModal = ({
 
     const onSubmit = (form: UpdateTaskRequest) => {
         if (taskId) {
+            console.log('form nè', form);
             updateTask(taskId, form);
             handleCloseModal();
         }

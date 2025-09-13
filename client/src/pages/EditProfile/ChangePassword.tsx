@@ -31,7 +31,10 @@ const ChangePassword = () => {
     });
 
     const onSubmit = (form: ChangePasswordForm) => {
-        changePassword(form);
+        changePassword({
+            oldPassword: form.oldPassword,
+            newPassword: form.newPassword,
+        });
     };
 
     return (

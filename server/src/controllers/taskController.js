@@ -1,13 +1,10 @@
 import Task from '../models/Task.js';
+import { toTaskDTO } from '../dtos/taskDto.js';
 
 export const getAllTasks = async (req, res, next) => {
     try {
         const tasks = await Task.find({ userId: req.user.id }).sort({ createdAt: -1 }).lean();
-        const transform = tasks.map((task) => ({
-            ...task,
-            taskId: task._id.toString(),
-            _id: undefined,
-        }));
+        const transform = tasks.map((task) => toTaskDTO(task));
 
         res.json({ tasks: transform });
     } catch (error) {
@@ -27,13 +24,10 @@ export const createTask = async (req, res, next) => {
             priority,
             dueDate,
         });
+
         res.status(201).json({
             message: 'Tạo task thành công',
-            task: {
-                ...task,
-                taskId: task._id.toString(),
-                _id: undefined,
-            },
+            task: toTaskDTO(task),
         });
     } catch (error) {
         next(error);
@@ -55,11 +49,7 @@ export const updateTask = async (req, res, next) => {
 
         res.json({
             message: 'Cập nhật task thành công',
-            task: {
-                ...task,
-                taskId: task._id.toString(),
-                _id: undefined,
-            },
+            task: toTaskDTO(task),
         });
     } catch (error) {
         next(error);

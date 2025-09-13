@@ -6,7 +6,7 @@ export const EditProfileApi = async (form: EditProfileRequest) => {
         const response = await request.put<{
             message: string;
             user: UserProfile;
-        }>('user/editProfile', form);
+        }>('users/editProfile', form);
         return response.data;
     } catch (err) {
         console.log('error from LoginAPI', err);
@@ -15,7 +15,7 @@ export const EditProfileApi = async (form: EditProfileRequest) => {
 
 export const ChangePasswordApi = async (form: ChangePasswordRequest) => {
     try {
-        const response = await request.put<{ message: string }>('user/changePassword', form);
+        const response = await request.put<{ message: string }>('users/changePassword', form);
         return response.data;
     } catch (err) {
         console.log('error from RegisterAPI', err);
