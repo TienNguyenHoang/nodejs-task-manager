@@ -9,7 +9,8 @@ export const EditProfileApi = async (form: EditProfileRequest) => {
         }>('users/editProfile', form);
         return response.data;
     } catch (err) {
-        console.log('error from LoginAPI', err);
+        console.log('error from EditProfileApi', err);
+        throw err;
     }
 };
 
@@ -18,6 +19,7 @@ export const ChangePasswordApi = async (form: ChangePasswordRequest) => {
         const response = await request.put<{ message: string }>('users/changePassword', form);
         return response.data;
     } catch (err) {
-        console.log('error from RegisterAPI', err);
+        console.log('error from ChangePasswordApi', err);
+        throw err;
     }
 };

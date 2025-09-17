@@ -6,17 +6,17 @@ const authMiddleware = (req, res, next) => {
     const authHeader = req.headers['authorization'];
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Không có token' });
+        return res.status(401).json({ code: 'TOKEN_MISSING', message: 'Không có token' });
     }
 
-    const token = authHeader.split(' ')[1];
+    const accessToken = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({ message: 'Token không hợp lệ' });
+        return res.status(401).json({ code: 'TOKEN_INVALID', message: 'Token không hợp lệ' });
     }
 };
 

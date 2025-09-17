@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
@@ -22,6 +23,7 @@ app.use(
         origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
     }),
 );
 
@@ -35,6 +37,8 @@ app.use(
     }),
 );
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.use('/api', routes);
 

@@ -17,7 +17,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
     user: User;
-    token: string;
+    accessToken: string;
 };
 
 export type RegisterRequest = {
@@ -28,7 +28,7 @@ export type RegisterRequest = {
 
 export type RegisterResponse = {
     user: User;
-    token: string;
+    accessToken: string;
 };
 
 export type EditProfileRequest = {

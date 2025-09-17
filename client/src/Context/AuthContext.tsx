@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 
-import { LoginApi, RegisterApi, EditProfileApi, ChangePasswordApi } from '~/services';
+import { LoginApi, RegisterApi, EditProfileApi, ChangePasswordApi, LogoutApi, RefreshApi } from '~/services';
 import type {
     UserProfile,
     LoginRequest,
@@ -14,6 +15,7 @@ import type {
     LoginResponse,
     RegisterResponse,
 } from '~/Models';
+import { registerRefreshHandler } from '~/utils/authService';
 
 type UserContextType = {
     user: UserProfile | null;
@@ -33,6 +35,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return storeUser && accessTokenCookie ? JSON.parse(storeUser) : null;
     });
 
+    const handleRefreshToken = useCallback(async (httpRequest: any, originalRequest: any, handleError: any) => {
+        try {
+            const data = await RefreshApi();
+            const newAccessToken = data.accessToken;
+            Cookies.set('accessToken', newAccessToken, { expires: 7 });
+            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            return httpRequest(originalRequest);
+        } catch (refreshError) {
+            Cookies.remove('accessToken');
+            setUser(null);
+            localStorage.removeItem('user');
+            handleError(refreshError);
+            return Promise.reject(refreshError);
+        }
+    }, []);
+
+    useEffect(() => {
+        registerRefreshHandler(handleRefreshToken);
+    }, [handleRefreshToken]);
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -40,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (data) {
             const redirectTo = location.state?.from?.pathname || '/';
             toast.success('Đăng nhập thành công');
-            Cookies.set('accessToken', data.token, { expires: 5 });
+            Cookies.set('accessToken', data.accessToken, { expires: 7 });
             navigate(redirectTo, { replace: true });
             setUser(data.user);
             localStorage.setItem('user', JSON.stringify(data.user));
@@ -61,11 +83,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loginHandler(data);
     };
 
-    const logoutUser = () => {
+    const logoutUser = async () => {
         if (!user) {
             toast.warning('Không thể đăng xuất khi chưa đăng nhập');
             return;
         }
+        await LogoutApi();
         Cookies.remove('accessToken');
         setUser(null);
         localStorage.removeItem('user');
@@ -74,29 +97,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const editProfileUser = async (form: EditProfileRequest) => {
-        const data = await EditProfileApi(form);
-        if (data) {
-            toast.success(data.message);
-            const user: UserProfile = {
-                userId: data.user.userId,
-                email: data.user.email,
-                fullName: data.user.fullName,
-            };
-            setUser(user);
-            localStorage.setItem('user', JSON.stringify(user));
+        try {
+            const data = await EditProfileApi(form);
+            if (data) {
+                toast.success(data.message);
+                const user: UserProfile = {
+                    userId: data.user.userId,
+                    email: data.user.email,
+                    fullName: data.user.fullName,
+                };
+                setUser(user);
+                localStorage.setItem('user', JSON.stringify(user));
+            }
+        } catch (err: any) {
+            if (
+                err.response?.status === 401 ||
+                (err.response?.status === 403 &&
+                    (err.response?.data?.code === 'REFRESH_EXPIRED' || err.response?.data?.code === 'REFRESH_INVALID'))
+            ) {
+                navigate('/login');
+            } else {
+                console.error(err);
+            }
         }
     };
 
     const changePassword = async (form: ChangePasswordRequest) => {
-        const data = await ChangePasswordApi(form);
-        if (data) {
-            toast.success(data.message);
-            toast.info('Vui lòng đăng nhập lại!');
-            Cookies.remove('accessToken');
-            setUser(null);
-            localStorage.removeItem('user');
+        try {
+            const data = await ChangePasswordApi(form);
+            if (data) {
+                toast.success(data.message);
+                toast.info('Vui lòng đăng nhập lại!');
+                Cookies.remove('accessToken');
+                setUser(null);
+                localStorage.removeItem('user');
 
-            navigate('/login');
+                navigate('/login');
+            }
+        } catch (err: any) {
+            if (
+                err.response?.status === 401 ||
+                (err.response?.status === 403 &&
+                    (err.response?.data?.code === 'REFRESH_EXPIRED' || err.response?.data?.code === 'REFRESH_INVALID'))
+            ) {
+                navigate('/login');
+            } else {
+                console.error(err);
+            }
         }
     };
 

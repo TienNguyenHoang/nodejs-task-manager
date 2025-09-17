@@ -64,7 +64,6 @@ const EditTaskModal = ({
 
     const onSubmit = (form: UpdateTaskRequest) => {
         if (taskId) {
-            console.log('form nè', form);
             updateTask(taskId, form);
             handleCloseModal();
         }

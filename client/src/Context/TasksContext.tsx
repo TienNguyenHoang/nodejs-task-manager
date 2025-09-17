@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useEffect, useState, useContext, type ReactNode } from 'react';
 
@@ -6,6 +7,7 @@ import { Priority, Status, type CreateTaskRequest, type Task, type UpdateTaskReq
 import { CreateTaskStatistics, type TaskStatisticsType } from '~/Helpers';
 import { DashboardFilterOptions, PendingSortOptions, CompletedSortOptions } from '~/pages/components';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 type ModalType = {
     type: 'create' | 'edit' | 'delete' | undefined;
@@ -46,18 +48,31 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const [tasks, setTasks] = useState<Task[] | undefined>();
     const [open, setOpen] = useState(false);
     const [type, setType] = useState<ModalType>();
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchApi = async () => {
-            const data = await GetAllTaskApi();
-            const newData = data?.tasks.map((task) => {
-                return {
+            try {
+                const data = await GetAllTaskApi();
+                const newData = data?.tasks.map((task) => ({
                     ...task,
                     createdAt: new Date(task.createdAt),
                     dueDate: new Date(task.dueDate),
-                };
-            });
-            setTasks(newData);
+                }));
+                setTasks(newData);
+            } catch (err: any) {
+                if (
+                    err.response?.status === 401 ||
+                    (err.response?.status === 403 &&
+                        (err.response?.data?.code === 'REFRESH_EXPIRED' ||
+                            err.response?.data?.code === 'REFRESH_INVALID'))
+                ) {
+                    navigate('/login');
+                } else {
+                    console.error(err);
+                }
+            }
         };
+
         fetchApi();
     }, []);
 
@@ -160,32 +175,73 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const createTask = async (form: CreateTaskRequest) => {
-        const data = await CreateTaskApi(form);
-        if (data) {
-            toast.success(data.message);
-            setTasks([
-                ...(tasks as Task[]),
-                {
-                    ...data.task,
-                    createdAt: new Date(data.task.createdAt),
-                    dueDate: new Date(data.task.dueDate),
-                },
-            ]);
+        try {
+            const data = await CreateTaskApi(form);
+            if (data) {
+                toast.success(data.message);
+                setTasks([
+                    ...(tasks as Task[]),
+                    {
+                        ...data.task,
+                        createdAt: new Date(data.task.createdAt),
+                        dueDate: new Date(data.task.dueDate),
+                    },
+                ]);
+            }
+        } catch (err: any) {
+            if (
+                err.response?.status === 401 ||
+                (err.response?.status === 403 &&
+                    (err.response?.data?.code === 'REFRESH_EXPIRED' || err.response?.data?.code === 'REFRESH_INVALID'))
+            ) {
+                navigate('/login');
+            } else {
+                console.error(err);
+            }
         }
     };
 
     const updateTask = async (taskId: string, form: UpdateTaskRequest) => {
-        const data = await UpdateTaskApi(taskId, form);
-        if (data) {
-            toast.success(data.message);
-            const newTasks = tasks?.map((task) => {
-                if (task.taskId === data?.task.taskId) {
-                    return {
-                        ...data.task,
-                        createdAt: new Date(data.task.createdAt),
-                        dueDate: new Date(data.task.dueDate),
-                    };
-                } else {
+        try {
+            const data = await UpdateTaskApi(taskId, form);
+            if (data) {
+                toast.success(data.message);
+                const newTasks = tasks?.map((task) => {
+                    if (task.taskId === data?.task.taskId) {
+                        return {
+                            ...data.task,
+                            createdAt: new Date(data.task.createdAt),
+                            dueDate: new Date(data.task.dueDate),
+                        };
+                    } else {
+                        return {
+                            ...task,
+                            createdAt: new Date(task.createdAt),
+                            dueDate: new Date(task.dueDate),
+                        };
+                    }
+                });
+                setTasks(newTasks as Task[]);
+            }
+        } catch (err: any) {
+            if (
+                err.response?.status === 401 ||
+                (err.response?.status === 403 &&
+                    (err.response?.data?.code === 'REFRESH_EXPIRED' || err.response?.data?.code === 'REFRESH_INVALID'))
+            ) {
+                navigate('/login');
+            } else {
+                console.error(err);
+            }
+        }
+    };
+
+    const deleteTask = async (taskId: string) => {
+        try {
+            const data = await DeleteTaskApi(taskId);
+            toast.success(data?.message);
+            const newTasks = tasks?.filter((task) => {
+                if (task.taskId !== taskId) {
                     return {
                         ...task,
                         createdAt: new Date(task.createdAt),
@@ -193,23 +249,18 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
                     };
                 }
             });
-            setTasks(newTasks as Task[]);
-        }
-    };
-
-    const deleteTask = async (taskId: string) => {
-        const data = await DeleteTaskApi(taskId);
-        toast.success(data?.message);
-        const newTasks = tasks?.filter((task) => {
-            if (task.taskId !== taskId) {
-                return {
-                    ...task,
-                    createdAt: new Date(task.createdAt),
-                    dueDate: new Date(task.dueDate),
-                };
+            setTasks(newTasks);
+        } catch (err: any) {
+            if (
+                err.response?.status === 401 ||
+                (err.response?.status === 403 &&
+                    (err.response?.data?.code === 'REFRESH_EXPIRED' || err.response?.data?.code === 'REFRESH_INVALID'))
+            ) {
+                navigate('/login');
+            } else {
+                console.error(err);
             }
-        });
-        setTasks(newTasks);
+        }
     };
 
     const TaskStatistics = CreateTaskStatistics(tasks);

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import { callRefreshHandler } from '~/utils/authService';
 
 import { handleError } from '~/Helpers';
 
@@ -22,15 +23,28 @@ httpRequest.interceptors.request.use(
 
 httpRequest.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         console.log('error from interceptor', error);
         if (error.response) {
+            // handle refresh access token
+            const originalRequest = error.config;
+            if (
+                error.response?.status === 401 &&
+                !originalRequest._retry &&
+                !originalRequest.url.includes('/refresh')
+            ) {
+                originalRequest._retry = true;
+                return callRefreshHandler(httpRequest, originalRequest, handleError);
+            }
+
+            // Global Error handler
             handleError(error);
         } else if (error.request) {
             toast.error('Không nhận được phản hồi từ server');
         } else {
             toast.error('Lỗi cấu hình request', error.message);
         }
+
         return Promise.reject(error);
     },
 );

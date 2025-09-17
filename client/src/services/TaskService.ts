@@ -8,6 +8,7 @@ export const GetAllTaskApi = async () => {
         return response.data;
     } catch (err) {
         console.log('error from GetAllTaskApi', err);
+        throw err;
     }
 };
 
@@ -20,6 +21,7 @@ export const CreateTaskApi = async (form: CreateTaskRequest) => {
         return response.data;
     } catch (err) {
         console.log('error from CreateTaskApi', err);
+        throw err;
     }
 };
 
@@ -32,6 +34,7 @@ export const UpdateTaskApi = async (taskId: string, form: UpdateTaskRequest) => 
         return response.data;
     } catch (err) {
         console.log('error from UpdateTaskApi', err);
+        throw err;
     }
 };
 
@@ -41,5 +44,6 @@ export const DeleteTaskApi = async (taskId: string) => {
         return response.data;
     } catch (err) {
         console.log('error from DeleteTaskApi', err);
+        throw err;
     }
 };
